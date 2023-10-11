@@ -1,6 +1,11 @@
 
 #include "rb_trees.h"
 
+/**
+ * recursive_check - check if red black tree is valid
+ * @tree: root of red-black tree
+ * Return: 1 if rules are OK, 0 if rules are not OK
+*/
 int recursive_check(const rb_tree_t *tree)
 {
 	if (tree == NULL)
