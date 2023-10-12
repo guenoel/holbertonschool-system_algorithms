@@ -20,23 +20,25 @@ void swap_colors(rb_tree_t *parent, rb_tree_t *grandparent)
  */
 void rotate_left(rb_tree_t **tree, rb_tree_t *parent)
 {
-	rb_tree_t *right_child = parent->right;
+	rb_tree_t *right_child = parent->right; /* future new parent */
 
+	/* little son become son... */
 	parent->right = right_child->left;
-
+	/* ...and then his grandpa become parent if exists */
 	if (parent->right)
 		parent->right->parent = parent;
 
+	/* modify grandpa */
 	right_child->parent = parent->parent;
-
-	if (!parent->parent)
+	if (!parent->parent) /* no grandpa */
 		*tree = right_child;
-	else if (parent == parent->parent->left)
+	else if (parent == parent->parent->left) /* left child of grandpa */
 		parent->parent->left = right_child;
 	else
-		parent->parent->right = right_child;
-
+		parent->parent->right = right_child; /* right child of grandpa */
+	/* modify left child */
 	right_child->left = parent;
+	/* parent of old head is now old right child */
 	parent->parent = right_child;
 }
 
@@ -72,7 +74,7 @@ void rotate_cases(rb_tree_t **tree, rb_tree_t *new_node, rb_tree_t *parent,
 {
 	rb_tree_t *uncle = NULL;
 
-	uncle = is_right ? grandparent->right : grandparent->left;
+	uncle = is_right ? grandparent->left : grandparent->right;
 
 	/* Case 1: Uncle is RED */
 	if (uncle && uncle->color == RED)
@@ -85,15 +87,21 @@ void rotate_cases(rb_tree_t **tree, rb_tree_t *new_node, rb_tree_t *parent,
 	else
 	{
 		/* Case 2: Uncle is BLACK and new_node is the right child */
-		if (new_node == parent->right)
+		if (!is_right && new_node == parent->right)
 		{
-			is_right ? rotate_left(tree, parent) : rotate_right(tree, parent);
+			rotate_left(tree, parent);
+			new_node = parent;
+			parent = new_node->parent;
+		}
+		if (is_right && new_node == parent->left)
+		{
+			rotate_right(tree, parent);
 			new_node = parent;
 			parent = new_node->parent;
 		}
 
 		/* Case 3: Uncle is BLACK and new_node is the left child */
-		is_right ? rotate_right(tree, grandparent) : rotate_left(tree, grandparent);
+		is_right ? rotate_left(tree, grandparent) : rotate_right(tree, grandparent);
 		swap_colors(parent, grandparent);
 		new_node = parent;
 	}
