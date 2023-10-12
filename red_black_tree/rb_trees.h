@@ -47,4 +47,6 @@ void swap_colors(rb_tree_t *parent, rb_tree_t *grandparent);
 void rotate_right(rb_tree_t **tree, rb_tree_t *grandparent);
 void rotate_left(rb_tree_t **tree, rb_tree_t *parent);
 
+rb_tree_t *array_to_rb_tree(int *array, size_t size)
+
 #endif /* _RB_TREES_H_ */
