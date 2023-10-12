@@ -88,17 +88,14 @@ void rotate_cases(rb_tree_t **tree, rb_tree_t **new_node, rb_tree_t *parent,
 	else
 	{
 		/* Case 2: Uncle is BLACK and new_node is the right child */
-		printf("is_right: %d 2nd condition: %d\n", is_right, (*new_node == parent->left));
 		if (!is_right && (*new_node == parent->right))
 		{
-			printf("------------test1----------\n");
 			rotate_left(tree, parent);
 			*new_node = parent;
 			parent = (*new_node)->parent;
 		}
 		if (is_right && (*new_node == parent->left))
 		{
-			printf("------------test2----------\n");
 			rotate_right(tree, parent);
 			*new_node = parent;
 			parent = (*new_node)->parent;
