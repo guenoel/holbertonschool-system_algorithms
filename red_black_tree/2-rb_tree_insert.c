@@ -107,26 +107,7 @@ void rotate_cases(rb_tree_t **tree, rb_tree_t *new_node, rb_tree_t *parent,
 	}
 }
 
-// void fix_rb_insert(rb_tree_t **tree, rb_tree_t *new_node)
-// {
-// 	rb_tree_t *parent = NULL;
-// 	rb_tree_t *grandparent = NULL;
 
-// 	while (new_node != *tree && new_node->color == RED
-// 			&& new_node->parent->color == RED)
-// 	{
-// 		parent = new_node->parent;
-// 		grandparent = parent->parent;
-
-// 		/* If parent is the left child of grandparent */
-// 		if (parent == grandparent->left)
-// 			rotate_cases(tree, new_node, parent, grandparent, 0);
-// 		else /* If parent is the right child of grandparent */
-// 			rotate_cases(tree, new_node, parent, grandparent, 1);
-// 	}
-
-// 	(*tree)->color = BLACK;
-// }
 
 void fix_rb_insert(rb_tree_t **tree, rb_tree_t *new_node)
 {
