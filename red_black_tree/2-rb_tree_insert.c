@@ -130,7 +130,8 @@ void fix_rb_insert(rb_tree_t **tree, rb_tree_t *new_node)
 	{
 		parent = new_node->parent;
 		grandparent = parent->parent;
-		rotate_cases(tree, &new_node, parent, grandparent, !(parent == grandparent->left));
+		rotate_cases(tree, &new_node, parent, grandparent,
+						!(parent == grandparent->left));
 	}
 
 	(*tree)->color = BLACK;
@@ -140,6 +141,7 @@ void fix_rb_insert(rb_tree_t **tree, rb_tree_t *new_node)
  * rb_tree_insert - insert a new node in a red-black tree.
  * @tree: Double pointer to the root node of the tree.
  * @value: value of new node.
+ * Return: Pointer to head of the tree
  */
 rb_tree_t *rb_tree_insert(rb_tree_t **tree, int value)
 {
