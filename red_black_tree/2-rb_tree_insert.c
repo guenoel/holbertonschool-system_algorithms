@@ -69,11 +69,18 @@ void rotate_right(rb_tree_t **tree, rb_tree_t *grandparent)
 	grandparent->parent = parent;
 }
 
+/**
+ * rotate_cases - handle all cases to fix red-black tree
+ * @tree: Double pointer to the root node of the tree.
+ * @new_node: Double pointer to new node.
+ * @parent: Pointer to the parent node to rotate.
+ * @grandparent: Pointer to the grandparent node to rotate.
+ * @is_right: Boolean to select direction of the rotation
+ */
 void rotate_cases(rb_tree_t **tree, rb_tree_t **new_node, rb_tree_t *parent,
 				rb_tree_t *grandparent, int is_right)
 {
 	rb_tree_t *uncle = NULL;
-
 
 	uncle = is_right ? grandparent->left : grandparent->right;
 
@@ -108,6 +115,11 @@ void rotate_cases(rb_tree_t **tree, rb_tree_t **new_node, rb_tree_t *parent,
 	}
 }
 
+/**
+ * fix_rb_insert - fix red-black tree after new node inserted.
+ * @tree: Double pointer to the root node of the tree.
+ * @new_node: new node inserted.
+ */
 void fix_rb_insert(rb_tree_t **tree, rb_tree_t *new_node)
 {
 	rb_tree_t *parent = NULL;
@@ -118,17 +130,17 @@ void fix_rb_insert(rb_tree_t **tree, rb_tree_t *new_node)
 	{
 		parent = new_node->parent;
 		grandparent = parent->parent;
-
-		/* If parent is the left child of grandparent */
-		if (parent == grandparent->left)
-			rotate_cases(tree, &new_node, parent, grandparent, 0);
-		else /* If parent is the right child of grandparent */
-			rotate_cases(tree, &new_node, parent, grandparent, 1);
+		rotate_cases(tree, &new_node, parent, grandparent, !(parent == grandparent->left));
 	}
 
 	(*tree)->color = BLACK;
 }
 
+/**
+ * rb_tree_insert - insert a new node in a red-black tree.
+ * @tree: Double pointer to the root node of the tree.
+ * @value: value of new node.
+ */
 rb_tree_t *rb_tree_insert(rb_tree_t **tree, int value)
 {
 	rb_tree_t *new_node = rb_tree_node(NULL, value, RED);
