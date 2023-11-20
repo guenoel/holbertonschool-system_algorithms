@@ -15,16 +15,16 @@ int main(void)
 	rb_tree_t *node;
 
 	root = NULL;
-	node = rb_tree_insert(&root, 98);
+	node = rb_tree_insert(&root, 43);
 	printf("Inserted: %d\n", node->n);
 	rb_tree_print(root);
-	node = rb_tree_insert(&root, 402);
+	node = rb_tree_insert(&root, 34);
 	printf("Inserted: %d\n", node->n);
 	rb_tree_print(root);
-	node = rb_tree_insert(&root, 512);
+	node = rb_tree_insert(&root, 65);
 	printf("Inserted: %d\n", node->n);
 	rb_tree_print(root);
-	node = rb_tree_insert(&root, 12);
+	node = rb_tree_insert(&root, 13);
 	printf("Inserted: %d\n", node->n);
 	rb_tree_print(root);
 	node = rb_tree_insert(&root, 46);
@@ -47,5 +47,6 @@ int main(void)
 	node = rb_tree_insert(&root, 780);
 	printf("Inserted: %d\n", node->n);
 	rb_tree_print(root);
+
 	return (0);
 }
