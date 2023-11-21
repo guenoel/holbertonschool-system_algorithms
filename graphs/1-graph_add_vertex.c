@@ -51,7 +51,10 @@ vertex_t *graph_add_vertex(graph_t *graph, const char *str)
 	{
 		/* check if vertice content already exist */
 		if (!strcmp(current_vertex->content, str))
+		{
+			printf("Failed to add [%s]\n", str);
 			return (NULL);
+		}
 		current_vertex = current_vertex->next;
 	}
 	new_vertex = create_vertex(str, graph->nb_vertices);
