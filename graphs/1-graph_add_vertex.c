@@ -9,6 +9,8 @@
  */
 vertex_t *graph_add_vertex(graph_t *graph, const char *str)
 {
+	vertex_t *current_vertex = graph->vertices;
+	size_t current_index = 0;
 	vertex_t *new_vertex = (vertex_t *)malloc(sizeof(vertex_t));
 
 	if (!new_vertex)
@@ -19,5 +21,16 @@ vertex_t *graph_add_vertex(graph_t *graph, const char *str)
 	new_vertex->index = 0;
 	new_vertex->nb_edges = 0;
 	new_vertex->next = NULL;
+
+	graph->nb_vertices++;
+	if (!current_vertex)
+		graph->vertices = new_vertex;
+	while (!current_vertex->next)
+	{
+		new_vertex->index++;
+		current_vertex = current_vertex->next;
+	}
+	current_vertex->next = new_vertex;
+
 	return (new_vertex);
 }
