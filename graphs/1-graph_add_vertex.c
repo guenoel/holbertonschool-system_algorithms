@@ -35,7 +35,6 @@ vertex_t *graph_add_vertex(graph_t *graph, const char *str)
 	/* Check for NULL parameters */
 	if (graph == NULL || str == NULL)
 		return (NULL);
-
 	/* Case of empty graph */
 	if (!graph->vertices)
 	{
@@ -44,19 +43,18 @@ vertex_t *graph_add_vertex(graph_t *graph, const char *str)
 		graph->nb_vertices++;
 		return (new_vertex);
 	}
-
 	/* Case of non-empty graph */
 	current_vertex = graph->vertices;
 	while (current_vertex->next != NULL)
 	{
 		/* check if vertice content already exist */
 		if (!strcmp(current_vertex->content, str))
-		{
-			printf("Failed to add [%s]\n", str);
 			return (NULL);
-		}
 		current_vertex = current_vertex->next;
 	}
+	/* check if vertice content already exist for last node */
+	if (!strcmp(current_vertex->content, str))
+		return (NULL);
 	new_vertex = create_vertex(str, graph->nb_vertices);
 	current_vertex->next = new_vertex;
 	graph->nb_vertices++;
