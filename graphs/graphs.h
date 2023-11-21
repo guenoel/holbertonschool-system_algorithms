@@ -1,6 +1,9 @@
 #ifndef GRAPHS_H
 #define GRAPHS_H
 
+#include <stdio.h>
+#include <stdlib.h>
+
 /**
  * enum edge_type_e - Enumerates the different types of
  * connection between two vertices
