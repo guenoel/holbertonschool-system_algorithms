@@ -6,7 +6,7 @@
  */
 graph_t *graph_create(void)
 {
-	graph_t *new_graph = malloc(sizeof(graph_t));
+	graph_t *new_graph = (graph_t *)malloc(sizeof(graph_t));
 
 	if (!new_graph)
 		return (NULL);
