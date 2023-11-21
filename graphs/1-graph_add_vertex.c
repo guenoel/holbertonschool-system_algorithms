@@ -10,7 +10,6 @@
 vertex_t *graph_add_vertex(graph_t *graph, const char *str)
 {
 	vertex_t *current_vertex = graph->vertices;
-	size_t current_index = 0;
 	vertex_t *new_vertex = (vertex_t *)malloc(sizeof(vertex_t));
 
 	if (!new_vertex)
