@@ -1,5 +1,9 @@
 #include "graphs.h"
 
+/**
+ * free_edges - delete a edge
+ * @edges: Pointer to the head of the edges to free
+ */
 void free_edges(edge_t *edges)
 {
 	edge_t *tmp_edge = NULL;
@@ -18,16 +22,19 @@ void free_edges(edge_t *edges)
  */
 void graph_delete(graph_t *graph)
 {
-	vertex_t *current_vertex = graph->vertices;
-	vertex_t *tmp_vertex = NULL;
-
-	while (current_vertex != NULL)
+	if (graph)
 	{
-		tmp_vertex = current_vertex;
-		current_vertex = current_vertex->next;
-		free_edges(tmp_vertex->edges);
-		free(tmp_vertex->content);
-		free(tmp_vertex);
+		vertex_t *current_vertex = graph->vertices;
+		vertex_t *tmp_vertex = NULL;
+
+		while (current_vertex != NULL)
+		{
+			tmp_vertex = current_vertex;
+			current_vertex = current_vertex->next;
+			free_edges(tmp_vertex->edges);
+			free(tmp_vertex->content);
+			free(tmp_vertex);
+		}
+		free(graph);
 	}
-	free(graph);
 }
