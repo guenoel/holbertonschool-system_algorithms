@@ -101,11 +101,9 @@ int graph_add_edge(graph_t *graph, const char *src, const char *dest,
 	vertex_t *src_vertex = NULL;
 	vertex_t *dest_vertex = NULL;
 
-	if (!graph)
+	if (!graph || !src || !dest)
 		return (0);
 	if (!graph->vertices)
-		return (0);
-	if (!src || !dest)
 		return (0);
 	if (check_src_dest(graph, src, dest) == 0)
 		return (0);
