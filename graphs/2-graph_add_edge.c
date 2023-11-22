@@ -105,6 +105,8 @@ int graph_add_edge(graph_t *graph, const char *src, const char *dest,
 		return (0);
 	if (!graph->vertices)
 		return (0);
+	if (!src || !dest)
+		return (0);
 	if (check_src_dest(graph, src, dest) == 0)
 		return (0);
 	src_new_edge = edge_create(graph, dest);
