@@ -1,6 +1,8 @@
 #include "graphs.h"
 #include <stdbool.h>
 
+#define MAX_VERTICES 1024
+
 size_t recursion_traverse(const vertex_t *current_vertex,
 							bool *visited_vertex,
 							size_t depth,
@@ -21,9 +23,8 @@ size_t recursion_traverse(const vertex_t *current_vertex,
 	{
 		if (!visited_vertex[current_edge->dest->index])
 		{
-/* 			printf("%ld\n", current_edge->dest->index); */
 			size_t current_depth = recursion_traverse(current_edge->dest,
-												visited_vertex, ++depth, action);
+												visited_vertex, depth + 1, action);
 			max_depth = (current_depth > max_depth) ? current_depth : max_depth;
 		}
 		current_edge = current_edge->next;
@@ -36,19 +37,16 @@ size_t recursion_traverse(const vertex_t *current_vertex,
 size_t depth_first_traverse(const graph_t *graph,
 							void (*action)(const vertex_t *v, size_t depth))
 {
-	size_t i;
+	/* size_t i; */
 	size_t depth = 0;
 	vertex_t *current_vertex = NULL;
-	bool visited_vertex[graph->nb_vertices];
+	bool visited_vertex[MAX_VERTICES] = {false};
 
 	if (!graph || !action)
 		return (0);
 	current_vertex = graph->vertices;
-	for (i = 0; i < graph->nb_vertices; i++)
-		visited_vertex[i] = false;
-
-	depth = recursion_traverse(current_vertex->edges->dest, visited_vertex,
-								0, action);
+	depth = recursion_traverse(current_vertex, visited_vertex,
+								depth, action);
 
 	return (depth);
 }
