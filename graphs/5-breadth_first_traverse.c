@@ -1,105 +1,100 @@
 #include "graphs.h"
 #include <stdbool.h>
 
-bool check_in_queue(size_t *queue, size_t q_w_index, size_t index)
+/**
+ * push_in_stack - add a new node at the beginning of a stack_t list
+ * @stack: pointer to the head of the stack
+ * @vertex: vertex to add
+ * @depth: depth of the vertex
+ * Return: pointer to the new node (begining of the stack)
+ */
+stack_t *push_in_stack(stack_t **stack, vertex_t *vertex, size_t depth)
 {
-	size_t i = 0;
+	stack_t *new_node = NULL;
 
-	for (i = 0; i <= q_w_index; i++)
-	{
-		if (queue[i] == index)
-			return (true);
-	}
-	return (false);
+	/* printf("added stack: %s\n", vertex->content); */
+	new_node = (stack_t *)malloc(sizeof(stack_t));
+	if (!new_node)
+		return (NULL);
+	new_node->vertex = vertex;
+	new_node->depth = depth;
+	new_node->next = *stack;
+	*stack = new_node;
+	return (new_node);
 }
 
-size_t go_trought_function(vertex_t *list_vertices,
-							vertex_t *current_vertex,
-							int *visited_vertex,
-							size_t *queue,
-							size_t *depth_change,
-							size_t depth,
-							void (*action)(const vertex_t *v, size_t depth))
+/**
+ * pop_from_fifo_stack - removes the top element of a stack_t stack
+ * @stack: pointer to the head of the stack
+ * Return: pointer to the tail element of the stack
+ */
+stack_t *pop_from_fifo_stack(stack_t **stack)
 {
-	size_t q_w_index = 0;
-	size_t q_r_index = 0;
-	edge_t *current_edge = NULL;
-	vertex_t *temp = NULL;
+	stack_t *prev = NULL;
+	stack_t *temp = NULL;
 
-	depth_change[1] = 1;
-	queue[q_w_index] = current_vertex->index;
-	while (q_w_index + 1 >= q_r_index)
+	if (!stack || !*stack)
+		return (NULL);
+	temp = *stack;
+	if (temp->next)
 	{
-		if (depth_change[q_r_index] == 1)
+		while (temp->next)
 		{
-			depth++;
-			depth_change[q_r_index + 1] = 0;
-		}
-		/* print tab, index and town name */
-		if (!visited_vertex[current_vertex->index])
-			action(current_vertex, depth);
-
-		/* check current vertex as visited */
-		visited_vertex[current_vertex->index] = 1;
-		/* enqueue neighbours of current vertex */
-		current_edge = current_vertex->edges;
-		while (current_edge)
-		{
-			if (visited_vertex[current_edge->dest->index] == 0)
-			{
-				if (!check_in_queue(queue, q_w_index, current_edge->dest->index))
-				{
-					q_w_index++;
-					queue[q_w_index] = current_edge->dest->index;
-				}
-				if (current_edge->next == NULL)
-					depth_change[q_w_index + 2] = 1;
-			}
-			current_edge = current_edge->next;
-		}
-
-		/* to find current vertex in main list of vertices */
-		temp = list_vertices;
-		while (temp)
-		{
-			if (queue[q_r_index] == temp->index)
-			{
-				current_vertex = temp;
-				break;
-			}
+			prev = temp;
 			temp = temp->next;
 		}
-		/* increase read index is like dequeue */
-		q_r_index++;
 	}
-
-	return (depth);
+	else
+		prev = NULL;
+	/* printf("poped stack: %s\n", temp->vertex->content); */
+	/* printf("new_tail: %s\n", prev->vertex->content); */
+	if (prev)
+		prev->next = NULL;
+	/* free(*stack); */
+	return (prev);
 }
 
 size_t breadth_first_traverse(const graph_t *graph,
 								void (*action)(const vertex_t *v, size_t depth))
 {
-	vertex_t *current_vertex = NULL;
-	int *visited_vertex = NULL;
-	size_t *queue = NULL;
-	size_t *depth_change = NULL;
+	stack_t *head = NULL;
+	stack_t *tail = NULL;
 	size_t depth = 0;
+	size_t prev_depth = 0;
+	bool *pushed_vertex = NULL;
 
 	if (!graph || !action)
 		return (0);
-	visited_vertex = (int *)calloc(graph->nb_vertices, sizeof(int));
-	if (!visited_vertex)
+	pushed_vertex = (bool *)calloc(graph->nb_vertices, sizeof(bool));
+	if (!pushed_vertex)
 		return (0);
-	queue = (size_t *)calloc(graph->nb_vertices, sizeof(size_t));
-	if (!queue)
-		return (0);
-	depth_change = (size_t *)calloc(graph->nb_vertices, sizeof(size_t));
-	if (!depth_change)
-		return (0);
-	current_vertex = graph->vertices;
-	depth = go_trought_function(current_vertex, current_vertex, visited_vertex,
-								queue, depth_change, depth, action);
-	free(visited_vertex);
-	free(queue);
-	return (depth);
+	head = push_in_stack(&head, graph->vertices, depth);
+	pushed_vertex[graph->vertices->index] = true;
+	tail = head;
+	depth++;
+	while (tail)
+	{
+		edge_t *current_edge = tail->vertex->edges;
+
+		/* printf("prev depth: %ld\n", prev_depth); */
+		/* printf("tail->depth: %ld\n", tail->depth); */
+
+		if (tail->depth > prev_depth)
+			depth++;
+		while (current_edge)
+		{
+			if (!pushed_vertex[current_edge->dest->index])
+			{
+				push_in_stack(&head, current_edge->dest, depth);
+				pushed_vertex[current_edge->dest->index] = true;
+			}
+			current_edge = current_edge->next;
+		}
+		/* printf("depth: %lu\n", tail->depth); */
+		/* fflush(stdout); */
+		action(tail->vertex, tail->depth);
+		prev_depth = tail->depth;
+		tail = pop_from_fifo_stack(&head);
+	}
+	return (depth - 1);
 }

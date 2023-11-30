@@ -67,6 +67,20 @@ typedef struct graph_s
 	vertex_t    *vertices;
 } graph_t;
 
+/**
+ * struct stack_s - stack of vertices discovered
+ *
+ * @depth: depth of the vertex
+ * @vertex: Pointer to the node of our adjacency linked list
+ * @next: next node in the stack
+ */
+typedef struct stack_s
+{
+	size_t depth;
+	vertex_t *vertex;
+	struct stack_s *next;
+} stack_t;
+
 void graph_display(const graph_t *graph);
 graph_t *graph_create(void);
 vertex_t *graph_add_vertex(graph_t *graph, const char *str);
