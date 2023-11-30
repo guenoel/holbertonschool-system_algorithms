@@ -1,6 +1,18 @@
 #include "graphs.h"
 #include <stdbool.h>
 
+bool check_in_queue(size_t *queue, size_t q_w_index, size_t index)
+{
+	size_t i = 0;
+
+	for (i = 0; i <= q_w_index; i++)
+	{
+		if (queue[i] == index)
+			return (true);
+	}
+	return (false);
+}
+
 size_t go_trought_function(vertex_t *list_vertices,
 							vertex_t *current_vertex,
 							int *visited_vertex,
@@ -13,17 +25,20 @@ size_t go_trought_function(vertex_t *list_vertices,
 	size_t q_r_index = 0;
 	edge_t *current_edge = NULL;
 	vertex_t *temp = NULL;
-	size_t i = 0;
 
 	depth_change[1] = 1;
 	queue[q_w_index] = current_vertex->index;
 	while (q_w_index + 1 >= q_r_index)
 	{
 		if (depth_change[q_r_index] == 1)
+		{
 			depth++;
+			depth_change[q_r_index + 1] = 0;
+		}
 		/* print tab, index and town name */
 		if (!visited_vertex[current_vertex->index])
 			action(current_vertex, depth);
+
 		/* check current vertex as visited */
 		visited_vertex[current_vertex->index] = 1;
 		/* enqueue neighbours of current vertex */
@@ -32,14 +47,7 @@ size_t go_trought_function(vertex_t *list_vertices,
 		{
 			if (visited_vertex[current_edge->dest->index] == 0)
 			{
-				bool is_in_queue = false;
-
-				for (i = 0; i <= q_w_index; i++)
-				{
-					if (queue[i] == current_edge->dest->index)
-						is_in_queue = true;
-				}
-				if (!is_in_queue)
+				if (!check_in_queue(queue, q_w_index, current_edge->dest->index))
 				{
 					q_w_index++;
 					queue[q_w_index] = current_edge->dest->index;
@@ -86,7 +94,7 @@ size_t breadth_first_traverse(const graph_t *graph,
 	if (!queue)
 		return (0);
 	depth_change = (size_t *)calloc(graph->nb_vertices, sizeof(size_t));
-	if (!queue)
+	if (!depth_change)
 		return (0);
 	current_vertex = graph->vertices;
 	depth = go_trought_function(current_vertex, current_vertex, visited_vertex,
