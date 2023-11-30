@@ -12,7 +12,6 @@ stack_t *push_in_stack(stack_t **stack, vertex_t *vertex, size_t depth)
 {
 	stack_t *new_node = NULL;
 
-	/* printf("added stack: %s\n", vertex->content); */
 	new_node = (stack_t *)malloc(sizeof(stack_t));
 	if (!new_node)
 		return (NULL);
@@ -35,28 +34,30 @@ stack_t *pop_from_fifo_stack(stack_t **stack)
 
 	if (!stack || !*stack)
 		return (NULL);
-	temp = *stack;
-	if (temp->next)
+	temp = *stack; /* necessary when vertex is alone */
+	if (temp->next) /* if vertex not alone... */
 	{
-		while (temp->next)
+		while (temp->next) /* ...go to tail of stack */
 		{
 			prev = temp;
 			temp = temp->next;
 		}
+		temp = prev->next; /* save pointer to free (re-using same variable) */
+		prev->next = NULL; /* unlink vertex poped*/
 	}
-	else
+	else /* if alone */
 		prev = NULL;
-	/* printf("poped stack: %s\n", temp->vertex->content); */
-	/* printf("new_tail: %s\n", prev->vertex->content); */
-	if (prev)
-	{
-		temp = prev->next;
-		prev->next = NULL;
-	}
-	free(temp);
+	free(temp); /* free vertex poped */
 	return (prev);
 }
 
+/**
+ * breadth_first_traverse - goes through a graph using the breadth-first
+ * traversal algorithm
+ * @graph: pointer to the graph to traverse
+ * @action: pointer to a function to be called for each visited vertex
+ * Return: the max depth reached, or 0 on failure
+ */
 size_t breadth_first_traverse(const graph_t *graph,
 								void (*action)(const vertex_t *v, size_t depth))
 {
@@ -73,6 +74,7 @@ size_t breadth_first_traverse(const graph_t *graph,
 	pushed_vertex = (bool *)calloc(graph->nb_vertices, sizeof(bool));
 	if (!pushed_vertex)
 		return (0);
+	/* init stack with first vertex */
 	head = push_in_stack(&head, graph->vertices, depth);
 	pushed_vertex[graph->vertices->index] = true;
 	tail = head;
@@ -81,11 +83,10 @@ size_t breadth_first_traverse(const graph_t *graph,
 	{
 		edge_t *current_edge = tail->vertex->edges;
 
-		/* printf("prev depth: %ld\n", prev_depth); */
-		/* printf("tail->depth: %ld\n", tail->depth); */
+		/* condition to increase depth for next pushed vertices */
 		if (tail->depth > prev_depth)
 			depth++;
-		while (current_edge)
+		while (current_edge) /* loop to push neighbours */
 		{
 			if (!pushed_vertex[current_edge->dest->index])
 			{
