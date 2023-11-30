@@ -49,8 +49,11 @@ stack_t *pop_from_fifo_stack(stack_t **stack)
 	/* printf("poped stack: %s\n", temp->vertex->content); */
 	/* printf("new_tail: %s\n", prev->vertex->content); */
 	if (prev)
+	{
+		temp = prev->next;
 		prev->next = NULL;
-	/* free(*stack); */
+	}
+	free(temp);
 	return (prev);
 }
 
@@ -65,6 +68,8 @@ size_t breadth_first_traverse(const graph_t *graph,
 
 	if (!graph || !action)
 		return (0);
+	if (!graph->vertices)
+		return (0);
 	pushed_vertex = (bool *)calloc(graph->nb_vertices, sizeof(bool));
 	if (!pushed_vertex)
 		return (0);
@@ -78,7 +83,6 @@ size_t breadth_first_traverse(const graph_t *graph,
 
 		/* printf("prev depth: %ld\n", prev_depth); */
 		/* printf("tail->depth: %ld\n", tail->depth); */
-
 		if (tail->depth > prev_depth)
 			depth++;
 		while (current_edge)
@@ -90,11 +94,10 @@ size_t breadth_first_traverse(const graph_t *graph,
 			}
 			current_edge = current_edge->next;
 		}
-		/* printf("depth: %lu\n", tail->depth); */
-		/* fflush(stdout); */
 		action(tail->vertex, tail->depth);
 		prev_depth = tail->depth;
 		tail = pop_from_fifo_stack(&head);
 	}
+	free(pushed_vertex);
 	return (depth - 1);
 }
