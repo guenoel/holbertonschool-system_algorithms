@@ -136,6 +136,14 @@ void *heap_extract(heap_t *heap)
 
 	if (!heap || !heap->root)
 		return (NULL);
+	if (heap->size == 1)
+	{
+		num_extracted = heap->root->data;
+		free(heap->root);
+		heap->root = NULL;
+		heap->size--;
+		return (num_extracted);
+	}
 	last_leaf = search_last_leaf2(heap); /* Insert node at the end of heap */
 	num_extracted = remove_and_replace_root(heap, last_leaf);
 
