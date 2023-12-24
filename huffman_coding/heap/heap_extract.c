@@ -50,13 +50,13 @@ binary_tree_node_t *swap_node2(binary_tree_node_t *node1,
 }
 
 /**
- * search_leaf_to_remove - Search the last leaf in a binary tree
+ * search_last_leaf2 - Search the last leaf in a binary tree
  *
  * @heap: Pointer to the heap to search the last leaf in
  *
  * Return: Pointer to the last leaf
  */
-binary_tree_node_t *search_leaf_to_remove(heap_t *heap)
+binary_tree_node_t *search_last_leaf2(heap_t *heap)
 {
 	binary_tree_node_t *current;
 	binary_tree_node_t **array;
@@ -90,6 +90,39 @@ binary_tree_node_t *search_leaf_to_remove(heap_t *heap)
 }
 
 /**
+ * remove_and_replace_root - Removes the root node and replaces it with
+ * the last leaf
+ *
+ * @heap: Pointer to the heap to remove the root node from
+ * @last_leaf: Pointer to the last leaf in the heap
+ *
+ * Return: The data from the root node extracted
+ */
+void *remove_and_replace_root(heap_t *heap, binary_tree_node_t *last_leaf)
+{
+	binary_tree_node_t *temp = NULL;
+	void *num_extracted;
+
+	temp = heap->root; /* save previous root */
+	heap->root = last_leaf; /* update new root (previous last leaf) */
+	if (heap->root != temp) /* condition if there only 2 nodes in the heap */
+		heap->root->left = temp->left;
+	else
+		heap->root->left = NULL;
+	heap->root->right = temp->right;
+	num_extracted = temp->data; /* save num extracted before free */
+	free(temp);
+	/* update parent of previous last leaf */
+	if (last_leaf->parent->left == last_leaf)
+		last_leaf->parent->left = NULL;
+	else
+		last_leaf->parent->right = NULL;
+	last_leaf->parent = NULL;
+
+	return (num_extracted);
+}
+
+/**
  * heap_extract - Extracts the root node from a Min Binary Heap
  *
  * @heap: Pointer to the heap to extract the root node from
@@ -98,32 +131,20 @@ binary_tree_node_t *search_leaf_to_remove(heap_t *heap)
  */
 void *heap_extract(heap_t *heap)
 {
-	binary_tree_node_t *last_leaf = NULL, *current_node = NULL, *temp = NULL,
-						*smallest = NULL;
+	binary_tree_node_t *last_leaf = NULL, *current_node = NULL, *smallest = NULL;
+	void *num_extracted;
 
 	if (!heap || !heap->root)
 		return (NULL);
-	/* Insert node at the end of the heap */
-	last_leaf = search_leaf_to_remove(heap);
-	/* save previous root */
-	temp = heap->root;
-	/* update new root (previous last leaf) */
-	heap->root = last_leaf;
-	heap->root->left = temp->left;
-	heap->root->right = temp->right;
-	/* update parent of previous last leaf */
-	if (last_leaf->parent->left == last_leaf)
-		last_leaf->parent->left = NULL;
-	else
-		last_leaf->parent->right = NULL;
-	last_leaf->parent = NULL;
-	heap->size--;
+	last_leaf = search_last_leaf2(heap); /* Insert node at the end of heap */
+	num_extracted = remove_and_replace_root(heap, last_leaf);
 
+	heap->size--;
 	current_node = heap->root;
 	/* Swap nodes until the heap is ordered */
 	while ((current_node->left || current_node->right))
 	{
-		if (current_node->right == NULL)
+		if (!current_node->right)
 			smallest = current_node->left;
 		else
 			if (heap->data_cmp(current_node->left->data, current_node->right->data) < 0)
@@ -137,5 +158,5 @@ void *heap_extract(heap_t *heap)
 			current_node = swap_node2(current_node, smallest);
 		}
 	}
-	return (temp->data);
+	return (num_extracted);
 }
