@@ -59,12 +59,14 @@ binary_tree_node_t *swap_node2(binary_tree_node_t *node1,
 binary_tree_node_t *search_leaf_to_remove(heap_t *heap)
 {
 	binary_tree_node_t *current;
-	binary_tree_node_t *array[heap->size];
+	binary_tree_node_t **array;
 	binary_tree_node_t *last_leaf;
 	int cursor = 0, index = 0;
 
 	if (heap->size == 0 || heap->root == NULL)
 		return (NULL);
+
+	array = malloc(sizeof(binary_tree_node_t *) * heap->size);
 	/* Add root to the start of the queue */
 	array[index++] = heap->root;
 
@@ -83,6 +85,7 @@ binary_tree_node_t *search_leaf_to_remove(heap_t *heap)
 	/* Return the last node */
 	/* -1 cause last loop increase index once too many */
 	last_leaf = array[index - 1];
+	free(array);
 	return (last_leaf);
 }
 
