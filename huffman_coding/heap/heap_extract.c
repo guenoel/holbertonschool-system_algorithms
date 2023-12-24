@@ -110,14 +110,15 @@ void *remove_and_replace_root(heap_t *heap, binary_tree_node_t *last_leaf)
 	else
 		heap->root->left = NULL;
 	heap->root->right = temp->right;
-	num_extracted = temp->data; /* save num extracted before free */
-	free(temp);
 	/* update parent of previous last leaf */
 	if (last_leaf->parent->left == last_leaf)
 		last_leaf->parent->left = NULL;
 	else
 		last_leaf->parent->right = NULL;
 	last_leaf->parent = NULL;
+
+	num_extracted = temp->data; /* save num extracted before free */
+	free(temp); /* free previous root */
 
 	return (num_extracted);
 }
