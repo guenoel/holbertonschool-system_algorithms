@@ -105,7 +105,7 @@ void *remove_and_replace_root(heap_t *heap, binary_tree_node_t *last_leaf)
 
 	temp = heap->root; /* save previous root */
 	heap->root = last_leaf; /* update new root (previous last leaf) */
-	if (heap->root != temp->left) /* condition if there only 2 nodes in the heap */
+	if (heap->root != temp->left) /* condition if only 2 nodes in the heap */
 		heap->root->left = temp->left;
 	else
 		heap->root->left = NULL;
