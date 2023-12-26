@@ -15,7 +15,7 @@ symbol_t *symbol_create(char data, size_t freq)
 	if (symbol == NULL)
 		return (NULL);
 
-	symbol->data = data;
+	symbol->data = data; /* the char */
 	symbol->freq = freq;
 
 	return (symbol);

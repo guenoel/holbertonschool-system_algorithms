@@ -3,13 +3,13 @@
 #include "heap/heap.h"
 
 /**
- * int_cmp - Compares two integers
- *
- * @p1: First pointer
- * @p2: Second pointer
- *
- * Return: Difference between the two strings
- */
+* int_cmp - Compares two integers
+*
+* @p1: First pointer
+* @p2: Second pointer
+*
+* Return: Difference between the two strings
+*/
 int int_cmp(void *p1, void *p2)
 {
 	int *n1, *n2;
@@ -20,13 +20,13 @@ int int_cmp(void *p1, void *p2)
 }
 
 /**
- * print_int - Stores a string in a buffer
- *
- * @buffer: Buffer to store the string
- * @data: Pointer to the string
- *
- * Return: Number of bytes written in buffer
- */
+* print_int - Stores a string in a buffer
+*
+* @buffer: Buffer to store the string
+* @data: Pointer to the string
+*
+* Return: Number of bytes written in buffer
+*/
 int print_int(char *buffer, void *data)
 {
 	int *n;
@@ -37,14 +37,14 @@ int print_int(char *buffer, void *data)
 	return (length);
 }
 
-void binary_tree_print(const binary_tree_node_t *root,
+void binary_tree_print(const binary_tree_node_t *heap,
 						int (*print_data)(char *, void *));
 
 /**
- * main - Entry point
- *
- * Return: EXIT_SUCCESS
- */
+* main - Entry point
+*
+* Return: EXIT_SUCCESS
+*/
 int main(void)
 {
 	heap_t *heap;
@@ -54,6 +54,7 @@ int main(void)
 	size_t size = sizeof(array) / sizeof(array[0]);
 	size_t i;
 	binary_tree_node_t *node;
+	int *extracted;
 
 	heap = heap_create(int_cmp);
 	if (heap == NULL)
@@ -72,9 +73,13 @@ int main(void)
 			fprintf(stderr, "Failed to insert a node\n");
 			return (EXIT_FAILURE);
 		}
-		binary_tree_print(heap->root, print_int);
-		printf("\n");
 	}
+	binary_tree_print(heap->root, print_int);
+	printf("Heap size: %lu\n\n", heap->size);
+
+	extracted = (int *)heap_extract(heap);
+	printf("Extracted: %d\n", *extracted);
+	binary_tree_print(heap->root, print_int);
 	printf("Heap size: %lu\n", heap->size);
 	return (EXIT_SUCCESS);
 }

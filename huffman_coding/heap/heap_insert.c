@@ -49,23 +49,17 @@ binary_tree_node_t *swap_node(binary_tree_node_t *node1,
 	return (node2);
 }
 
-/**
- * search_last_leaf - Search the last leaf in a binary tree
- *
- * @node: Pointer to the root node
- *
- * Return: Pointer to the last leaf
- */
-binary_tree_node_t *search_last_leaf(binary_tree_node_t *node)
+void fill_array(binary_tree_node_t *root,
+									binary_tree_node_t **array,
+									int index, int size)
 {
-	if (node == NULL)
-		return (NULL);
-
-	if (node->left == NULL || node->right == NULL)
-		return (node);
-
-	/* Recursively search in the right subtree if left is NULL */
-	return (search_last_leaf(node->left ? node->left : node->right));
+	if (root == NULL)
+		return;
+	array[index] = root;
+	if (root->left)
+		fill_array(root->left, array, ((2 * (index + 1)) - 1), size);
+	if (root->right)
+		fill_array(root->right, array, ((2 * (index + 1))), size);
 }
 
 /**
@@ -80,6 +74,8 @@ binary_tree_node_t *heap_insert(heap_t *heap, void *data)
 {
 	binary_tree_node_t *new_node = NULL;
 	binary_tree_node_t *current_node = NULL;
+	binary_tree_node_t **array;
+	int index = 0;
 
 	if (heap == NULL)
 		return (NULL);
@@ -97,12 +93,17 @@ binary_tree_node_t *heap_insert(heap_t *heap, void *data)
 		return (new_node);
 	}
 
+	/* Create an array representation of heap */
+	array = calloc(heap->size, sizeof(binary_tree_node_t *));
+	array[0] = heap->root;
+	fill_array(heap->root, array, index, heap->size);
 	/* Insert node at the end of the heap */
-	new_node->parent = search_last_leaf(heap->root);
+	new_node->parent = array[((heap->size) / 2) - 1];
 	if (new_node->parent->left == NULL)
 		new_node->parent->left = new_node;
 	else
 		new_node->parent->right = new_node;
+	free(array);
 
 	current_node = new_node;
 	/* Swap nodes until the heap is ordered */
