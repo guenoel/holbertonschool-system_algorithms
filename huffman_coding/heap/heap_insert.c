@@ -72,19 +72,16 @@ void fill_array(binary_tree_node_t *root,
  */
 binary_tree_node_t *heap_insert(heap_t *heap, void *data)
 {
-	binary_tree_node_t *new_node = NULL;
-	binary_tree_node_t *current_node = NULL;
+	binary_tree_node_t *new_node = NULL, *current_node = NULL;
 	binary_tree_node_t **array;
 	int index = 0;
 
 	if (heap == NULL)
 		return (NULL);
-
 	/* Create a new node */
 	new_node = binary_tree_node(NULL, data);
 	if (new_node == NULL)
 		return (NULL);
-
 	heap->size++;
 	/* Insert node at the root if the heap is empty */
 	if (heap->root == NULL)
@@ -92,7 +89,6 @@ binary_tree_node_t *heap_insert(heap_t *heap, void *data)
 		heap->root = new_node;
 		return (new_node);
 	}
-
 	/* Create an array representation of heap */
 	array = calloc(heap->size, sizeof(binary_tree_node_t *));
 	array[0] = heap->root;
@@ -104,7 +100,6 @@ binary_tree_node_t *heap_insert(heap_t *heap, void *data)
 	else
 		new_node->parent->right = new_node;
 	free(array);
-
 	current_node = new_node;
 	/* Swap nodes until the heap is ordered */
 	while (current_node->parent && heap->data_cmp(current_node->data,
