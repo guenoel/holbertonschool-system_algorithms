@@ -1,94 +1,146 @@
 #include "pathfinding.h"
 
 /**
- * point_push - creates a point and adds to a queue
- * @queue: queue
- * @x: X coordinate
- * @y: Y coordinate
- * Return: 1 if success, 0 if failed
+ * point_push - adds a point to the queue
+ * @path: queue to store the path
+ * @x: x coordinate
+ * @y: y coordinate
+ * Return: 1 if success, 0 if failure
  */
-int point_push(queue_t **queue, int x, int y)
+int point_push(queue_t **path, int x, int y)
 {
-	point_t *p;
+	point_t *new = malloc(sizeof(point_t));
 
-	p = malloc(sizeof(*p));
-	if (!p)
+	if (!new)
 		return (0);
-	p->x = x;
-	p->y = y;
-	queue_push_front(*queue, p);
+	new->x = x;
+	new->y = y;
+	queue_push_front(*path, new);
 	return (1);
 }
 
 /**
- * backtracker - Finds a new possible solution
- * @queue: queue with points
- * @saw: saw array
- * @map: map or maze
- * @rows: height of @map
- * @cols: width of @map
- * @x: current X coordinate
- * @y: current Y coordinate
+ * recursive_backtracker - recursive backtracking algorithm
+ * @path: queue to store the path
+ * @visited: 2D array of ints to mark visited cells
+ * @map: 2D array of chars representing the maze
+ * @rows: number of rows
+ * @cols: number of columns
+ * @start: starting point
+ * @x: current x coordinate
+ * @y: current y coordinate
  * @target: target point
- * Return: queue with points or NULL if failed
-*/
-int backtracker(queue_t **queue, int *saw, char **map, int rows,
-			int cols, int x, int y, point_t const *target)
+ * @moves: array of possible moves
+ * Return: 1 if target reached, 0 if not
+ */
+int recursive_backtracker(queue_t **path, int **visited, char **map, int rows,
+							int cols, point_t const *start,
+							int x, int y, point_t const *target, point_t *moves)
 {
-	int arr[][2] = {RIGHT, BOTTOM, LEFT, TOP}, i;
+	int i;
 
-	if (x < 0 || x >= cols || y < 0 || y >= rows ||
-	    map[y][x] == '1' || *(saw + y * cols + x) == 1)
+	if (x >= cols || y >= rows /* check if inside map (right and bottom) */
+			|| x < 0 || y < 0 /* check if inside map (left and top) */
+			|| map[y][x] == '1' /* check if wall */
+			|| visited[y][x] == 1) /* check if visited */
 		return (0);
 
 	printf("Checking coordinates [%d, %d]\n", x, y);
-	if (x == target->x && y == target->y)
-		return (point_push(queue, x, y));
-	*(saw + y * cols + x) = 1;
+	if (x == target->x && y == target->y) /* check if target reached */
+		return (point_push(path, x, y));
+	visited[y][x] = 1; /* mark as visited */
 
+	/* check all directions - if one is possible: add to queue */
 	for (i = 0; i < 4; ++i)
-		if (backtracker(queue, saw, map, rows, cols,
-					x + arr[i][0], y + arr[i][1], target))
-			return (point_push(queue, x, y));
+	{
+		if (recursive_backtracker(path, visited, map, rows, cols, start,
+								x + moves[i].x, y + moves[i].y, target, moves))
+			return (point_push(path, x, y));
+	}
+	/* else back to previous */
 	return (0);
 }
 
 /**
- * backtracking_array -  searches for the first path from a starting point to
- * a target point within a two-dimensional array
- * @map: pointer to a read-only two-dimensional array
- * @rows: number of rows of @map
- * @cols: number of cols of @map
- * @start: stores the coordinates of the starting point
- * @target: stores the coordinates of the target point
- * Return: queue, in which each node is a point in the path from start
- * to target
+ * create_map - creates a 2D array of ints
+ * @rows: number of rows
+ * @cols: number of columns
+ * Return: pointer to the array
+ */
+int **create_map(int rows, int cols)
+{
+	int i, j;
+	int **map = malloc(sizeof(int *) * rows);
+
+	if (!map)
+		return (NULL);
+	for (i = 0; i < rows; ++i)
+	{
+		map[i] = malloc(sizeof(int) * cols);
+		if (!map[i])
+		{
+			for (j = 0; j < i; ++j)
+				free(map[j]);
+			free(map);
+			return (NULL);
+		}
+		/* init map to 0 */
+		for (j = 0; j < cols; ++j)
+			map[i][j] = 0;
+	}
+	return (map);
+}
+
+/**
+ * backtracking_array - backtracking algorithm using an array
+ * @map: 2D array of chars representing the maze
+ * @rows: number of rows
+ * @cols: number of columns
+ * @start: starting point
+ * @target: target point
+ * Return: queue containing the path, NULL if failed
  */
 queue_t *backtracking_array(char **map, int rows, int cols,
-	point_t const *start, point_t const *target)
+							point_t const *start, point_t const *target)
 {
-	int *saw;
-	queue_t *queue;
-	int ret;
+	int i = 0, ret_val;
+	int **visited = NULL;
+	queue_t *path = NULL;
+	point_t RIGHT = {1, 0}, BOTTOM = {0, 1}, LEFT = {-1, 0}, TOP = {0, -1};
+	point_t *moves = malloc(sizeof(point_t *) * 4);
 
-	if (!map || !*map || !start || !target || rows < 1 || cols < 1)
+	if (!moves)
 		return (NULL);
-	saw = calloc(rows * cols, sizeof(*saw));
-	if (!saw)
+	moves[0] = RIGHT;
+	moves[1] = BOTTOM;
+	moves[2] = LEFT;
+	moves[3] = TOP;
+
+	if (!map || !*map || !rows || !cols || !start || !target)
 		return (NULL);
-	queue = queue_create();
-	if (!queue)
+
+	visited = create_map(rows, cols);
+
+	path = queue_create();
+	/* erase all if failed */
+	if (!path)
 	{
-		free(saw);
+		for (i = 0; i < rows; i++)
+			free(visited[i]);
+		free(visited);
 		return (NULL);
 	}
-	ret = backtracker(&queue, saw, map, rows, cols,
-				  start->x, start->y, target);
-	if (!ret)
+
+	ret_val = recursive_backtracker(&path, visited, map, rows, cols, start,
+									start->x, start->y, target, moves);
+	if (!ret_val)
 	{
-		queue_delete(queue);
-		queue = NULL;
+		queue_delete(path);
+		path = NULL;
 	}
-	free(saw);
-	return (queue);
+	for (i = 0; i < rows; i++)
+		free(visited[i]);
+	free(visited);
+	free(moves);
+	return (path);
 }
