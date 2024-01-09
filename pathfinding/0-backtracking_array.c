@@ -1,19 +1,48 @@
 #include "pathfinding.h"
 
-point_t *move(point_t const *point, point_t const *move)
+int point_push(queue_t **path, int x, int y)
 {
 	point_t *new = malloc(sizeof(point_t));
 	if (!new)
-		return (NULL);
-	new->x = point->x + move->x;
-	new->y = point->y + move->y;
-	return (new);
+		return (0);
+	new->x = x;
+	new->y = y;
+	queue_push_front(*path, new);
+	return (1);
+}
+
+int recursive_backtracker(queue_t **path, int **visited, char **map, int rows,
+							int cols, point_t const *start,
+							int x, int y, point_t const *target, point_t *moves)
+{
+	int i;
+
+	if (x >= cols || y >= rows /* check if inside map (right and bottom) */
+			|| x < 0 || y < 0 /* check if inside map (left and top) */
+			|| map[y][x] == '1' /* check if wall */
+			|| visited[y][x] == 1) /* check if visited */
+		return (0);
+
+	printf("Checking coordinates [%d, %d]\n", x, y);
+	if (x == target->x && y == target->y) /* check if target reached */
+		return (point_push(path, x, y));
+	visited[y][x] = 1; /* mark as visited */
+
+	/* check all directions - if one is possible: add to queue */
+	for (i = 0; i < 4; ++i)
+	{
+		if (recursive_backtracker(path, visited, map, rows, cols, start,
+								x + moves[i].x, y + moves[i].y, target, moves))
+			return (point_push(path, x, y));
+	}
+	/* else back to previous */
+	return (0);
 }
 
 queue_t *backtracking_array(char **map, int rows, int cols,
 							point_t const *start, point_t const *target)
 {
-	int i = 0, j = 0;
+	int i = 0, j = 0, ret_val;
 	int **visited = NULL;
 	point_t RIGHT = {1, 0};
 	point_t BOTTOM = {0, 1};
@@ -60,29 +89,13 @@ queue_t *backtracking_array(char **map, int rows, int cols,
 		return (NULL);
 	}
 
-	queue_push_front(path, (void *)start);
-	printf("Checking coordinates [%d, %d]\n", start->x, start->y);
-	while (((point_t *)path->front->ptr)->x != target->x
-		|| ((point_t *)path->front->ptr)->y != target->y)
+	ret_val = recursive_backtracker(&path, visited, map, rows, cols, start,
+									start->x, start->y, target, moves);
+	if (!ret_val)
 	{
-		i = 0;
-		while (i < 4)
-		{
-			point_t *new_position = move(path->front->ptr, &moves[i]);
-			i++;
-			if (map[new_position->y][new_position->x] == '0'
-				&& visited[new_position->y][new_position->x] == 0)
-			{
-				printf("Checking coordinates [%d, %d]\n", new_position->x, new_position->y);
-				visited[new_position->y][new_position->x] = 1;
-				queue_push_front(path, (void *)new_position);
-				i = 0;
-			}
-			if (((point_t *)path->front->ptr)->x == target->x
-				&& ((point_t *)path->front->ptr)->y == target->y)
-				return (path);
-		}
-		dequeue(path);
+		queue_delete(path);
+		path = NULL;
 	}
+	free(visited);
 	return (path);
 }
