@@ -1,5 +1,11 @@
 #include "nary_trees.h"
 
+/**
+ * nary_tree_insert - Insert a node in a N-ary tree
+ * @parent: Pointer to the parent node
+ * @str: Content of the new node
+ * Return: Pointer to the new node or NULL
+*/
 nary_tree_t *nary_tree_insert(nary_tree_t *parent, char const *str)
 {
 	nary_tree_t *new_node;
